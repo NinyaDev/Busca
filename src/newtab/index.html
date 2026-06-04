@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Tab</title>
+    <style>
+      /* The new-tab surface has no live page behind it, so we paint our own
+         designed backdrop (the overlay blurs the real page instead). */
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: radial-gradient(1200px 800px at 50% -10%, #2a2150 0%, #14141b 55%, #0c0c10 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>
