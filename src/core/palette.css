@@ -249,24 +249,36 @@
   font-size: 10px;
 }
 
-/* --- New Tab variant: no blur (the page's dot-grid shows through), wordmark below --- */
+/* --- New Tab variant ---
+   No live page to blur, so we build the depth ourselves: a soft lavender bloom
+   behind the panel, and the panel gets its OWN backdrop blur over the dot-grid so
+   it reads as glass - matching the richness the Cmd+K overlay gets for free. */
 .cp-root--newtab {
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  padding-top: 16vh;
+  background: radial-gradient(680px 380px at 50% 34%, rgba(185, 167, 236, 0.1), transparent 70%);
 }
 .cp-root--newtab .cp-backdrop {
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
+.cp-root--newtab .cp-panel {
+  margin-top: 0;
+  background: rgba(20, 19, 26, 0.72);
+  backdrop-filter: blur(16px) saturate(125%);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+}
 .cp-mark {
-  margin-top: 26px;
-  font-size: 15px;
+  margin-top: 28px;
+  font-size: 16px;
   font-weight: 600;
-  letter-spacing: 0.42em;
+  letter-spacing: 0.44em;
   /* optical centering for the letter-spacing */
-  padding-left: 0.42em;
+  padding-left: 0.44em;
   color: var(--cp-accent);
-  opacity: 0.82;
+  opacity: 0.85;
   user-select: none;
 }

@@ -12,9 +12,13 @@
         margin: 0;
         height: 100%;
         background-color: #0b0a0f;
-        background-image: radial-gradient(rgba(187, 170, 236, 0.06) 1px, transparent 1px);
-        background-size: 22px 22px;
-        background-position: center;
+        /* vignette to focus the center + a faint lavender dot-grid for texture */
+        background-image:
+          radial-gradient(130% 130% at 50% 35%, transparent 55%, rgba(0, 0, 0, 0.55)),
+          radial-gradient(rgba(187, 170, 236, 0.06) 1px, transparent 1px);
+        background-size: cover, 22px 22px;
+        background-position: center, center;
+        background-repeat: no-repeat, repeat;
       }
     </style>
   </head>
