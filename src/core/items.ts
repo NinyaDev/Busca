@@ -56,8 +56,10 @@ function webSearchItem(query: string): CommandItem {
 }
 
 /**
- * Compose the final result list:  [explicit bang] -> [ranked real matches] -> [web search]
- * The top ranked match is auto-selected, so Enter goes straight to it (omnibox feel).
+ * Compose the final result list:
+ *   - empty query  -> the quick-action tools (not the whole history)
+ *   - with a query -> [explicit bang] [top match] [web search] [rest of matches]
+ * The top match is auto-selected, so Enter goes straight to it (omnibox feel).
  */
 export function buildResults(
   query: string,
@@ -66,20 +68,26 @@ export function buildResults(
   searchFn: (items: CommandItem[], q: string) => CommandItem[],
 ): CommandItem[] {
   const q = query.trim()
-  const top: CommandItem[] = []
-  const bottom: CommandItem[] = []
 
-  if (q) {
-    const bang = bangItem(q)
-    if (bang) top.push(bang)
-    bottom.push(webSearchItem(q))
-  }
+  // Empty state: show the tools/quick-actions, not the whole history.
+  if (!q) return actionItems
 
   const matched = searchFn([...baseItems, ...actionItems], q)
+  const ordered: CommandItem[] = []
+
+  const bang = bangItem(q)
+  if (bang) ordered.push(bang)
+
+  // Top real match first, then web-search as the SECOND option, then the rest.
+  if (matched.length > 0) {
+    ordered.push(matched[0], webSearchItem(q), ...matched.slice(1))
+  } else {
+    ordered.push(webSearchItem(q))
+  }
 
   const seen = new Set<string>()
   const out: CommandItem[] = []
-  for (const it of [...top, ...matched, ...bottom]) {
+  for (const it of ordered) {
     if (seen.has(it.id)) continue
     seen.add(it.id)
     out.push(it)
