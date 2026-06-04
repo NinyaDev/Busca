@@ -5,6 +5,8 @@ import { mountInto } from './mount'
 // `?inline` gives us the compiled CSS as a string so we can adopt it into the
 // shadow root (no <style> injection into the host page).
 import paletteCss from '../core/palette.css?inline'
+import '@fontsource-variable/hanken-grotesk'
+import '@fontsource-variable/geist-mono'
 
 const open = signal(false)
 const items = signal<CommandItem[]>([])
