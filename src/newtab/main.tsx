@@ -9,7 +9,7 @@ import '../core/palette.css'
 // Chrome (since v27) parks keyboard focus in the omnibox on a fresh new-tab load
 // and ignores the page's focus() calls. Reloading once with a query string makes
 // the next load "not fresh", so our input can take focus. The blink is minimal.
-// (Toggle to first-keystroke focus instead by removing this block — see README.)
+// (Toggle to first-keystroke focus instead by removing this block - see README.)
 if (!location.search.includes('focus')) {
   location.search = '?focus'
 }

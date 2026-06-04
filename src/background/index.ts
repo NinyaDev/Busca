@@ -10,7 +10,7 @@ function isInjectable(url?: string): boolean {
 }
 
 // Cmd/Ctrl+K -> toggle the overlay on the active tab. (Cmd+T is handled entirely
-// by the New Tab Page override and never reaches here — Chrome reserves it.)
+// by the New Tab Page override and never reaches here - Chrome reserves it.)
 chrome.commands.onCommand.addListener(async (command) => {
   if (command !== 'toggle-overlay') return
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })

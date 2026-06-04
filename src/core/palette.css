@@ -2,7 +2,7 @@
  * Palette styling. Authored by hand (not Tailwind utilities) for three reasons:
  *  1) total control over the Arc/Zen-grade look + animations,
  *  2) it ships as one Constructable Stylesheet adopted into the overlay's shadow
- *     root — fully isolated from host-page CSS,
+ *     root - fully isolated from host-page CSS,
  *  3) no rem units (rem resolves against the host page's root font-size, which we
  *     don't control inside the overlay), so everything here is px.
  * Tailwind is still wired up for building out settings pages etc. later.

@@ -38,7 +38,7 @@ async function runQuickAction(actionId: string, senderTabId?: number): Promise<v
       return
 
     case 'clear-cache-24h':
-      // Scoped to the last 24h, cache only — never a blanket wipe.
+      // Scoped to the last 24h, cache only - never a blanket wipe.
       await chrome.browsingData.remove({ since: Date.now() - DAY_MS }, { cache: true, cacheStorage: true })
       return
 

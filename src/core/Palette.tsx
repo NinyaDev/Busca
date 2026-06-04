@@ -81,7 +81,7 @@ export function Palette({ baseItems, onExec, onClose, autoFocus = true, placehol
           ref={inputRef}
           class="cp-input"
           value={query}
-          placeholder={placeholder ?? 'Search tabs, history, bookmarks — or try /y, /w, /gh…'}
+          placeholder={placeholder ?? 'Search tabs, history, bookmarks - or try /y, /w, /gh…'}
           spellcheck={false}
           autocomplete="off"
           onInput={(e: JSX.TargetedEvent<HTMLInputElement>) => setQuery(e.currentTarget.value)}

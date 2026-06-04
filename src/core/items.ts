@@ -20,7 +20,7 @@ export function buildActionItems(): CommandItem[] {
 
 // Dynamic items depend on the live query: the matched bang (if any) plus a
 // web-search fallback. These are PREPENDED (not fuzzy-filtered) so a bang you
-// explicitly typed always sits at the top — bangs never trap the user, they
+// explicitly typed always sits at the top - bangs never trap the user, they
 // just add a row.
 export function buildDynamicItems(rawQuery: string): CommandItem[] {
   const q = rawQuery.trim()

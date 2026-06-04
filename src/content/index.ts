@@ -12,7 +12,7 @@ const items = signal<CommandItem[]>([])
 let host: HTMLElement | null = null
 
 // Pre-mount a hidden Shadow-DOM overlay at content-script load. Opening later is
-// just flipping a signal — the expensive setup (shadow attach, stylesheet parse,
+// just flipping a signal - the expensive setup (shadow attach, stylesheet parse,
 // Preact mount) is already paid for, which is what keeps the open near-instant.
 function ensureHost() {
   if (host) return

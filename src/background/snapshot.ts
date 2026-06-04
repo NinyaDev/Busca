@@ -2,7 +2,7 @@ import type { CommandItem } from '../shared/types'
 import { SOURCE_WEIGHT } from '../shared/types'
 
 // Builds the base item pool (open tabs + recent history + bookmarks) from the
-// Chrome APIs. P0 rebuilds this on each palette open — history.search over a few
+// Chrome APIs. P0 rebuilds this on each palette open - history.search over a few
 // thousand entries is a few tens of ms and runs off the critical path (the
 // palette shows its pre-mounted shell instantly, then fills when this arrives).
 // P1: cache in the service worker + persist to IndexedDB, refresh incrementally

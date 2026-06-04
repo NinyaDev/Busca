@@ -18,7 +18,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
   {
     id: 'clear-cache-24h',
     title: 'Clear cache (last 24h)',
-    subtitle: 'Cached files only — last 24 hours, all sites',
+    subtitle: 'Cached files only - last 24 hours, all sites',
     glyph: '🧹',
     keywords: 'delete browsing data purge',
     danger: true,

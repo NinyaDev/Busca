@@ -1,4 +1,4 @@
-// Bangs are just URL templates with a `%s` placeholder. No API, no keys — every
+// Bangs are just URL templates with a `%s` placeholder. No API, no keys - every
 // bang is a plain navigation to a public search page. Users will be able to add
 // their own later (same shape, stored in chrome.storage).
 
@@ -21,7 +21,7 @@ export const DEFAULT_BANGS: Bang[] = [
 ]
 
 // Supports both "/y query" (explicit) and "y query" (bare) syntaxes. Returns null
-// when the leading token isn't a known bang — callers then treat it as plain text.
+// when the leading token isn't a known bang - callers then treat it as plain text.
 const BANG_RE = /^\/?([a-z0-9]+)\s+(.+)$/i
 
 export function parseBang(input: string, bangs: Bang[]): { bang: Bang; query: string } | null {

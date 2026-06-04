@@ -1,4 +1,4 @@
-// The single shape every result in the palette takes — a tab, a history entry,
+// The single shape every result in the palette takes - a tab, a history entry,
 // a bookmark, a bang, or a quick action. The palette fuzzy-matches over a pile
 // of these and runs `action` on Enter. It never cares what `kind` something is.
 
@@ -6,7 +6,7 @@ export type ItemKind = 'tab' | 'history' | 'bookmark' | 'bang' | 'action' | 'sea
 
 // Actions are *serializable descriptors* (not functions) because items cross the
 // messaging boundary between the service worker and the UI. A single executor in
-// the service worker interprets them — see src/background/exec.ts.
+// the service worker interprets them - see src/background/exec.ts.
 export type ActionDescriptor =
   | { type: 'open-url'; url: string; where?: 'current' | 'newtab' }
   | { type: 'switch-tab'; tabId: number; windowId: number }

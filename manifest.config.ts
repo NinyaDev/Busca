@@ -16,7 +16,7 @@ export default defineManifest({
     newtab: 'src/newtab/index.html',
   },
   // 2) Cmd/Ctrl+K: a non-reserved shortcut that toggles the in-page overlay.
-  //    (Cmd+T itself can NOT be bound here — Chrome reserves it; see README.)
+  //    (Cmd+T itself can NOT be bound here - Chrome reserves it; see README.)
   commands: {
     'toggle-overlay': {
       suggested_key: { default: 'Ctrl+K', mac: 'Command+K' },
@@ -45,7 +45,7 @@ export default defineManifest({
 
   permissions: [
     'tabs', //          read/switch/duplicate/move open tabs
-    'history', //       search visited pages (sensitive — justify in review)
+    'history', //       search visited pages (sensitive - justify in review)
     'bookmarks', //     search bookmarks
     'tabGroups', //     show/respect tab groups in results
     'sessions', //      reopen recently closed tabs
