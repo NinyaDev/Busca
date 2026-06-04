@@ -1,0 +1,197 @@
+/*
+ * Palette styling. Authored by hand (not Tailwind utilities) for three reasons:
+ *  1) total control over the Arc/Zen-grade look + animations,
+ *  2) it ships as one Constructable Stylesheet adopted into the overlay's shadow
+ *     root — fully isolated from host-page CSS,
+ *  3) no rem units (rem resolves against the host page's root font-size, which we
+ *     don't control inside the overlay), so everything here is px.
+ * Tailwind is still wired up for building out settings pages etc. later.
+ */
+
+:host {
+  all: initial;
+}
+
+.cp-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --cp-bg: rgba(8, 8, 12, 0.5);
+  --cp-panel: rgba(26, 26, 32, 0.82);
+  --cp-border: rgba(255, 255, 255, 0.09);
+  --cp-text: #f3f3f6;
+  --cp-muted: #9a9aa6;
+  --cp-accent: #7c93ff;
+  --cp-sel: rgba(124, 147, 255, 0.16);
+  --cp-danger: #ff7a7a;
+}
+
+.cp-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--cp-bg);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  animation: cp-fade 120ms ease-out;
+}
+
+.cp-panel {
+  position: relative;
+  margin-top: 12vh;
+  width: min(640px, 92vw);
+  max-height: 62vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--cp-panel);
+  border: 1px solid var(--cp-border);
+  border-radius: 14px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  color: var(--cp-text);
+  animation: cp-pop 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cp-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cp-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cp-input {
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--cp-text);
+  font-size: 18px;
+  line-height: 1.4;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--cp-border);
+  width: 100%;
+  box-sizing: border-box;
+}
+.cp-input::placeholder {
+  color: var(--cp-muted);
+}
+
+.cp-list {
+  overflow-y: auto;
+  padding: 6px;
+}
+.cp-empty {
+  padding: 28px;
+  text-align: center;
+  color: var(--cp-muted);
+  font-size: 14px;
+}
+
+.cp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.cp-row--sel {
+  background: var(--cp-sel);
+}
+.cp-row--sel.cp-row--danger {
+  background: rgba(255, 122, 122, 0.14);
+}
+
+.cp-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.cp-icon img {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+.cp-glyph {
+  font-size: 16px;
+}
+
+.cp-rowtext {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.cp-title {
+  color: var(--cp-text);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cp-subtitle {
+  color: var(--cp-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cp-badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cp-accent);
+  border: 1px solid var(--cp-border);
+  border-radius: 6px;
+  padding: 2px 6px;
+  flex: none;
+}
+.cp-confirm {
+  font-size: 11px;
+  color: var(--cp-danger);
+  flex: none;
+}
+.cp-kind {
+  font-size: 11px;
+  color: var(--cp-muted);
+  flex: none;
+  opacity: 0.55;
+  min-width: 52px;
+  text-align: right;
+}
+
+.cp-footer {
+  display: flex;
+  gap: 16px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--cp-border);
+  font-size: 11px;
+  color: var(--cp-muted);
+}
+.cp-footer kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin: 0 1px;
+  font-family: inherit;
+}
