@@ -5,13 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>New Tab</title>
     <style>
-      /* The new-tab surface has no live page behind it, so we paint our own
-         designed backdrop (the overlay blurs the real page instead). */
+      /* Blueprint grid: near-black with a faint lavender dot-grid - intentional
+         texture instead of a generic gradient. The palette + wordmark sit on top. */
       html,
       body {
         margin: 0;
         height: 100%;
-        background: radial-gradient(1200px 800px at 50% -10%, #2a2150 0%, #14141b 55%, #0c0c10 100%);
+        background-color: #0b0a0f;
+        background-image: radial-gradient(rgba(187, 170, 236, 0.06) 1px, transparent 1px);
+        background-size: 22px 22px;
+        background-position: center;
       }
     </style>
   </head>

@@ -3,6 +3,8 @@ import { useEffect, useState } from 'preact/hooks'
 import { Palette } from '../core/Palette'
 import type { ActionDescriptor, CommandItem } from '../shared/types'
 import { sendMessage } from '../shared/messaging'
+import '@fontsource-variable/hanken-grotesk'
+import '@fontsource-variable/geist-mono'
 import '../core/palette.css'
 
 // --- New Tab Page auto-focus workaround ---
@@ -34,6 +36,7 @@ function App() {
     <Palette
       baseItems={items}
       autoFocus
+      variant="newtab"
       onExec={exec}
       // On the NTP the palette *is* the page; closing just refocuses the input.
       onClose={() => document.querySelector<HTMLInputElement>('.cp-input')?.focus()}
