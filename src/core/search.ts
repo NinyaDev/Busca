@@ -33,9 +33,11 @@ export function searchItems(items: CommandItem[], rawQuery: string): CommandItem
     const item = items[info.idx[infoIdx]]
     // uFuzzy `order` is best-first; turn rank into a [0,1] quality (higher = better).
     const matchQuality = 1 - rank / n
-    // Soft-normalize baseScore (~0..3) so it nudges rather than dominates.
-    const baseBoost = Math.min(item.baseScore, 3) / 3
-    ranked[rank] = { item, score: matchQuality * 0.75 + baseBoost * 0.25 }
+    // Normalize frecency-bearing baseScore (~0..4). Weighted a bit heavier than a
+    // pure-match ranker so a heavily-used site beats an incidental string match -
+    // the omnibox-style "most-used wins" feel.
+    const baseBoost = Math.min(item.baseScore, 4) / 4
+    ranked[rank] = { item, score: matchQuality * 0.7 + baseBoost * 0.3 }
   }
   ranked.sort((a, b) => b.score - a.score)
   return ranked.slice(0, MAX_RESULTS).map((r) => r.item)

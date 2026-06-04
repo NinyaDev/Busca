@@ -10,7 +10,7 @@ export function buildActionItems(): CommandItem[] {
     kind: 'action' as const,
     title: a.title,
     subtitle: a.subtitle,
-    iconGlyph: a.glyph ?? '⚡',
+    iconName: a.icon,
     badges: a.danger ? ['danger'] : undefined,
     matchText: `${a.title} ${a.subtitle ?? ''} ${a.keywords ?? ''}`,
     baseScore: 1.1,
@@ -18,58 +18,68 @@ export function buildActionItems(): CommandItem[] {
   }))
 }
 
-// Dynamic items depend on the live query: the matched bang (if any) plus a
-// web-search fallback. These are PREPENDED (not fuzzy-filtered) so a bang you
-// explicitly typed always sits at the top - bangs never trap the user, they
-// just add a row.
-export function buildDynamicItems(rawQuery: string): CommandItem[] {
-  const q = rawQuery.trim()
-  if (!q) return []
-  const out: CommandItem[] = []
-
-  const parsed = parseBang(q, DEFAULT_BANGS)
-  if (parsed) {
-    out.push({
-      id: `bang:${parsed.bang.token}`,
-      kind: 'bang',
-      title: `${parsed.bang.label}: ${parsed.query}`,
-      subtitle: `Search ${parsed.bang.label}`,
-      iconGlyph: parsed.bang.glyph ?? '⚡',
-      matchText: q,
-      baseScore: 5,
-      action: { type: 'open-url', url: fillBang(parsed.bang, parsed.query), where: 'current' },
-    })
+// An explicit bang row, shown at the very top - only when the user deliberately
+// starts the query with "/" (e.g. "/y cats"). Bare words never trigger it, so
+// typing "youtube" still ranks the real youtube.com match first.
+function bangItem(query: string): CommandItem | null {
+  if (!query.startsWith('/')) return null
+  const parsed = parseBang(query, DEFAULT_BANGS)
+  if (!parsed) return null
+  return {
+    id: `bang:${parsed.bang.token}`,
+    kind: 'bang',
+    title: `${parsed.bang.label}: ${parsed.query}`,
+    subtitle: `Search ${parsed.bang.label}`,
+    iconName: 'search',
+    matchText: query,
+    baseScore: 5,
+    action: { type: 'open-url', url: fillBang(parsed.bang, parsed.query), where: 'current' },
   }
-
-  out.push({
-    id: 'search:web',
-    kind: 'search',
-    title: `Search the web for “${q}”`,
-    iconGlyph: '🔍',
-    matchText: q,
-    baseScore: 0.1,
-    action: {
-      type: 'open-url',
-      url: `https://www.google.com/search?q=${encodeURIComponent(q)}`,
-      where: 'current',
-    },
-  })
-
-  return out
 }
 
-/** Compose the final, deduped, ranked result list shown in the palette. */
+// The web-search fallback. It lives at the BOTTOM of the list so it's always
+// available but never steals the default selection from a real result.
+function webSearchItem(query: string): CommandItem {
+  return {
+    id: 'search:web',
+    kind: 'search',
+    title: `Search the web for "${query}"`,
+    iconName: 'search',
+    matchText: query,
+    baseScore: 0.05,
+    action: {
+      type: 'open-url',
+      url: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+      where: 'current',
+    },
+  }
+}
+
+/**
+ * Compose the final result list:  [explicit bang] -> [ranked real matches] -> [web search]
+ * The top ranked match is auto-selected, so Enter goes straight to it (omnibox feel).
+ */
 export function buildResults(
   query: string,
   baseItems: CommandItem[],
   actionItems: CommandItem[],
   searchFn: (items: CommandItem[], q: string) => CommandItem[],
 ): CommandItem[] {
-  const dynamic = buildDynamicItems(query)
-  const matched = searchFn([...baseItems, ...actionItems], query)
+  const q = query.trim()
+  const top: CommandItem[] = []
+  const bottom: CommandItem[] = []
+
+  if (q) {
+    const bang = bangItem(q)
+    if (bang) top.push(bang)
+    bottom.push(webSearchItem(q))
+  }
+
+  const matched = searchFn([...baseItems, ...actionItems], q)
+
   const seen = new Set<string>()
   const out: CommandItem[] = []
-  for (const it of [...dynamic, ...matched]) {
+  for (const it of [...top, ...matched, ...bottom]) {
     if (seen.has(it.id)) continue
     seen.add(it.id)
     out.push(it)
