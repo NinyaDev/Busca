@@ -1,11 +1,12 @@
 /*
- * Palette styling. Authored by hand (not Tailwind utilities) for three reasons:
- *  1) total control over the Arc/Zen-grade look + animations,
+ * Busca palette styling. Hand-authored (not Tailwind utilities) for:
+ *  1) total control over the look + animations,
  *  2) it ships as one Constructable Stylesheet adopted into the overlay's shadow
  *     root - fully isolated from host-page CSS,
- *  3) no rem units (rem resolves against the host page's root font-size, which we
- *     don't control inside the overlay), so everything here is px.
- * Tailwind is still wired up for building out settings pages etc. later.
+ *  3) px units only (rem resolves against the host page root font-size).
+ *
+ * Identity: near-black surfaces, a single soft LAVENDER accent (easy on the eyes,
+ * never neon), Hanken Grotesk for UI, Geist Mono for URLs and key hints.
  */
 
 :host {
@@ -19,23 +20,31 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --cp-bg: rgba(8, 8, 12, 0.5);
-  --cp-panel: rgba(26, 26, 32, 0.82);
-  --cp-border: rgba(255, 255, 255, 0.09);
-  --cp-text: #f3f3f6;
-  --cp-muted: #9a9aa6;
-  --cp-accent: #7c93ff;
-  --cp-sel: rgba(124, 147, 255, 0.16);
-  --cp-danger: #ff7a7a;
+  font-family: var(--cp-font);
+  /* Surfaces */
+  --cp-bg: rgba(7, 6, 11, 0.55);
+  --cp-panel: rgba(21, 20, 27, 0.86);
+  --cp-border: rgba(187, 170, 236, 0.12);
+  --cp-border-strong: rgba(187, 170, 236, 0.2);
+  /* Ink */
+  --cp-text: #ece9f3;
+  --cp-muted: #9b95ad;
+  /* Soft lavender accent */
+  --cp-accent: #b9a7ec;
+  --cp-accent-ink: #cdbef5;
+  --cp-sel: rgba(185, 167, 236, 0.13);
+  --cp-danger: #f08a8a;
+  /* Type */
+  --cp-font: 'Hanken Grotesk Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --cp-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 .cp-backdrop {
   position: absolute;
   inset: 0;
   background: var(--cp-bg);
-  backdrop-filter: blur(8px) saturate(120%);
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  backdrop-filter: blur(9px) saturate(125%);
+  -webkit-backdrop-filter: blur(9px) saturate(125%);
   animation: cp-fade 120ms ease-out;
 }
 
@@ -48,48 +57,81 @@
   flex-direction: column;
   background: var(--cp-panel);
   border: 1px solid var(--cp-border);
-  border-radius: 14px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  border-radius: 16px;
+  /* depth: drop shadow + a hairline top highlight + a faint lavender bloom */
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.6),
+    0 2px 10px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   overflow: hidden;
   color: var(--cp-text);
-  animation: cp-pop 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: cp-pop 170ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes cp-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-
 @keyframes cp-pop {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: translateY(8px) scale(0.985); }
+  to { opacity: 1; transform: none; }
 }
 
+/* --- Search field (with leading icon + ghost-text autocomplete) --- */
+.cp-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--cp-border);
+}
+.cp-search {
+  color: var(--cp-muted);
+  flex: none;
+  display: flex;
+}
+.cp-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.cp-input,
+.cp-mirror {
+  font-family: var(--cp-font);
+  font-size: 18px;
+  line-height: 1.4;
+  padding: 17px 0;
+  letter-spacing: 0;
+}
 .cp-input {
   appearance: none;
   border: none;
   outline: none;
   background: transparent;
   color: var(--cp-text);
-  font-size: 18px;
-  line-height: 1.4;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--cp-border);
+  caret-color: var(--cp-accent);
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 .cp-input::placeholder {
   color: var(--cp-muted);
+}
+/* Ghost completion sits exactly under the typed text; the leading (typed) part is
+   transparent to reserve width, the remainder shows in muted ink (omnibox-style). */
+.cp-mirror {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  white-space: pre;
+  overflow: hidden;
+  color: transparent;
+  z-index: 0;
+}
+.cp-ghost {
+  color: var(--cp-muted);
+  opacity: 0.65;
 }
 
 .cp-list {
@@ -108,14 +150,16 @@
   align-items: center;
   gap: 12px;
   padding: 9px 12px;
-  border-radius: 9px;
+  border-radius: 10px;
   cursor: pointer;
 }
 .cp-row--sel {
   background: var(--cp-sel);
+  box-shadow: inset 2px 0 0 var(--cp-accent);
 }
 .cp-row--sel.cp-row--danger {
-  background: rgba(255, 122, 122, 0.14);
+  background: rgba(240, 138, 138, 0.13);
+  box-shadow: inset 2px 0 0 var(--cp-danger);
 }
 
 .cp-icon {
@@ -128,7 +172,7 @@
   color: var(--cp-muted);
 }
 .cp-row--sel .cp-icon {
-  color: var(--cp-text);
+  color: var(--cp-accent);
 }
 .cp-favicon {
   width: 18px;
@@ -155,18 +199,19 @@
 }
 .cp-subtitle {
   color: var(--cp-muted);
-  font-size: 12px;
+  font-family: var(--cp-mono);
+  font-size: 11.5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .cp-badge {
-  font-size: 10px;
+  font-size: 9.5px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--cp-accent);
-  border: 1px solid var(--cp-border);
+  border: 1px solid var(--cp-border-strong);
   border-radius: 6px;
   padding: 2px 6px;
   flex: none;
@@ -177,11 +222,12 @@
   flex: none;
 }
 .cp-kind {
-  font-size: 11px;
+  font-family: var(--cp-mono);
+  font-size: 10.5px;
   color: var(--cp-muted);
   flex: none;
-  opacity: 0.55;
-  min-width: 52px;
+  opacity: 0.5;
+  min-width: 56px;
   text-align: right;
 }
 
@@ -194,9 +240,33 @@
   color: var(--cp-muted);
 }
 .cp-footer kbd {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(187, 170, 236, 0.1);
+  color: var(--cp-accent-ink);
   border-radius: 4px;
   padding: 1px 5px;
   margin: 0 1px;
-  font-family: inherit;
+  font-family: var(--cp-mono);
+  font-size: 10px;
+}
+
+/* --- New Tab variant: no blur (the page's dot-grid shows through), wordmark below --- */
+.cp-root--newtab {
+  flex-direction: column;
+  align-items: center;
+}
+.cp-root--newtab .cp-backdrop {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.cp-mark {
+  margin-top: 26px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.42em;
+  /* optical centering for the letter-spacing */
+  padding-left: 0.42em;
+  color: var(--cp-accent);
+  opacity: 0.82;
+  user-select: none;
 }
