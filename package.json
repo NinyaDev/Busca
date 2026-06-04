@@ -1,9 +1,9 @@
 {
-  "name": "command-palette-chrome",
+  "name": "busca",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "A Raycast/Spotlight-style command palette for Chrome. Cmd+T opens it as the new tab page; Cmd/Ctrl+K opens it as an overlay on any page.",
+  "description": "Busca - a fast, keyboard-first command palette for Chrome. Cmd+T opens it as a new tab, Cmd/Ctrl+K as an overlay on any page.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@fontsource-variable/geist-mono": "^5.2.8",
+    "@fontsource-variable/hanken-grotesk": "^5.2.8",
     "@leeoniya/ufuzzy": "^1.0.18",
     "@preact/signals": "^1.3.2",
     "preact": "^10.25.4"
