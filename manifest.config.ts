@@ -5,9 +5,9 @@ import { defineManifest } from '@crxjs/vite-plugin'
 // like `history` and `<all_urls>` draw extra scrutiny).
 export default defineManifest({
   manifest_version: 3,
-  name: 'Command Palette',
+  name: 'Busca',
   description:
-    'A fast, keyboard-first command palette for Chrome. Cmd+T for a new-tab palette, Cmd/Ctrl+K for an overlay on any page.',
+    'Busca - a fast, keyboard-first command palette for Chrome. Cmd+T opens it as a new tab, Cmd/Ctrl+K as an overlay on any page.',
   version: '0.1.0',
 
   // --- Trigger surfaces (the hybrid strategy) ---
@@ -40,7 +40,7 @@ export default defineManifest({
   ],
 
   action: {
-    default_title: 'Open Command Palette',
+    default_title: 'Open Busca',
   },
 
   permissions: [

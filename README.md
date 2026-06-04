@@ -1,6 +1,6 @@
-# Command Palette for Chrome
+# Busca
 
-A fast, keyboard-first command palette for Chrome - Raycast/Spotlight for the browser, with a developer bent. Built on the **hybrid trigger strategy**:
+**Busca** ("search") is a fast, keyboard-first command palette for Chrome - Raycast/Spotlight for the browser, with a developer bent and a soft lavender identity. Built on the **hybrid trigger strategy**:
 
 - **Cmd+T / Ctrl+T** → opens the palette as the **New Tab Page** (we override the NTP; Chrome reserves Cmd+T so this is the only sanctioned way to land it there).
 - **Cmd+K / Ctrl+K** → opens the **same palette as an overlay** on whatever page you're on (Shadow-DOM isolated, blurs the live page behind it).
@@ -9,7 +9,7 @@ A fast, keyboard-first command palette for Chrome - Raycast/Spotlight for the br
 
 ## Stack
 
-Preact + `@preact/signals` · hand-authored CSS (adopted stylesheet, px units) · Tailwind (wired up for future settings UI) · [uFuzzy](https://github.com/leeoniya/uFuzzy) for matching · Vite + `@crxjs/vite-plugin` (MV3) · TypeScript.
+Preact + `@preact/signals` · hand-authored CSS (adopted stylesheet, px units) · Hanken Grotesk + Geist Mono (bundled via `@fontsource`) · Tailwind (wired up for future settings UI) · [uFuzzy](https://github.com/leeoniya/uFuzzy) for matching · Vite + `@crxjs/vite-plugin` (MV3) · TypeScript.
 
 ## Getting started
 
@@ -81,6 +81,6 @@ manifest.config.ts # MV3 manifest (permissions justified inline)
 
 ## Still needed from you
 
-- **Brand + icons:** name is currently "Command Palette". Provide 16/48/128px PNG icons (or approve generated placeholders) to add to the manifest `icons`/`action.default_icon`.
+- **App icons:** named **Busca** now, with a lavender identity. Still need 16/48/128px PNG app icons (or approve generated lavender placeholders) for the manifest `icons`/`action.default_icon`.
 - **Auto-focus preference:** the NTP uses the `?focus` reload trick (tiny blink). Say the word if you'd rather use first-keystroke focus (no blink, one extra key).
 - Nothing else is blocking: **no Google Cloud Console / OAuth and no API keys** are required for this feature set.
