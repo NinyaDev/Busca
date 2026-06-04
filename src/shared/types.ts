@@ -17,10 +17,10 @@ export interface CommandItem {
   kind: ItemKind
   title: string
   subtitle?: string
-  /** Favicon / image URL. Falls back to `iconGlyph` if it fails to load. */
+  /** Favicon / image URL. Falls back to the `iconName` line icon if it fails to load. */
   iconUrl?: string
-  /** Emoji/glyph shown when there is no icon (or it fails to load). */
-  iconGlyph?: string
+  /** Name of a line icon from src/core/icons.tsx, shown when there's no favicon. */
+  iconName?: string
   badges?: string[]
   /** The text fuzzy search runs against (usually title + url). */
   matchText: string

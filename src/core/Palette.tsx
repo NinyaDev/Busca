@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { CommandItem, ActionDescriptor } from '../shared/types'
 import { searchItems } from './search'
 import { buildActionItems, buildResults } from './items'
+import { Icon } from './icons'
 
 export interface PaletteProps {
   /** Tabs/history/bookmarks snapshot from the service worker. */
@@ -13,6 +14,16 @@ export interface PaletteProps {
   onClose: () => void
   autoFocus?: boolean
   placeholder?: string
+}
+
+// Favicon when we have one, falling back to the line icon if it fails to load
+// (some sites' CSP can block the _favicon image inside the overlay).
+function ResultIcon({ item }: { item: CommandItem }) {
+  const [broken, setBroken] = useState(false)
+  if (item.iconUrl && !broken) {
+    return <img class="cp-favicon" src={item.iconUrl} alt="" onError={() => setBroken(true)} />
+  }
+  return <Icon name={item.iconName} />
 }
 
 // The shared palette. Pure and surface-agnostic: it knows nothing about whether
@@ -97,15 +108,7 @@ export function Palette({ baseItems, onExec, onClose, autoFocus = true, placehol
               onClick={(e: JSX.TargetedMouseEvent<HTMLDivElement>) => exec(it, e.metaKey || e.ctrlKey)}
             >
               <span class="cp-icon">
-                {it.iconUrl ? (
-                  <img
-                    src={it.iconUrl}
-                    alt=""
-                    onError={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
-                  />
-                ) : (
-                  <span class="cp-glyph">{it.iconGlyph ?? '•'}</span>
-                )}
+                <ResultIcon item={it} />
               </span>
               <span class="cp-rowtext">
                 <span class="cp-title">{it.title}</span>
