@@ -34,6 +34,16 @@ function recency(lastVisitTime?: number): number {
   return Math.exp(-ageDays / 7)
 }
 
+// Frecency mirrors how the omnibox ranks: pages you've actually *typed* into the
+// address bar score strongest (typedCount), raw visit count helps (log-damped so
+// one runaway site doesn't dominate), and recency tilts close calls. This is what
+// makes "you" surface youtube.com at the top instead of a generic search row.
+function frecency(h: chrome.history.HistoryItem): number {
+  const visits = h.visitCount ?? 0
+  const typed = h.typedCount ?? 0
+  return Math.log2(1 + visits) * 0.4 + Math.min(typed, 12) * 0.25 + recency(h.lastVisitTime) * 1.2
+}
+
 function walkBookmarks(nodes: chrome.bookmarks.BookmarkTreeNode[], out: CommandItem[], path: string[] = []) {
   for (const node of nodes) {
     if (node.url) {
@@ -43,7 +53,7 @@ function walkBookmarks(nodes: chrome.bookmarks.BookmarkTreeNode[], out: CommandI
         title: node.title || node.url,
         subtitle: [path.join(' / '), prettyUrl(node.url)].filter(Boolean).join('  ·  '),
         iconUrl: faviconUrl(node.url),
-        iconGlyph: '⭐',
+        iconName: 'bookmark',
         badges: ['Bookmarked'],
         matchText: `${node.title ?? ''} ${node.url} ${path.join(' ')}`,
         baseScore: SOURCE_WEIGHT.bookmark,
@@ -91,7 +101,7 @@ export async function buildSnapshot(): Promise<CommandItem[]> {
       title: t.title || t.url,
       subtitle: prettyUrl(t.url),
       iconUrl: t.favIconUrl || faviconUrl(t.url),
-      iconGlyph: '🗂',
+      iconName: 'window',
       badges: ['Open'],
       matchText: `${t.title ?? ''} ${t.url}`,
       baseScore: SOURCE_WEIGHT.tab + (t.active ? 0.1 : 0),
@@ -107,9 +117,9 @@ export async function buildSnapshot(): Promise<CommandItem[]> {
       title: h.title || h.url,
       subtitle: prettyUrl(h.url),
       iconUrl: faviconUrl(h.url),
-      iconGlyph: '🕘',
+      iconName: 'clock',
       matchText: `${h.title ?? ''} ${h.url}`,
-      baseScore: SOURCE_WEIGHT.history * (0.5 + recency(h.lastVisitTime)),
+      baseScore: SOURCE_WEIGHT.history * (0.4 + frecency(h)),
       action: { type: 'open-url', url: h.url, where: 'current' },
     })
   }
