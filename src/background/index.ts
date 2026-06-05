@@ -32,7 +32,9 @@ chrome.commands.onCommand.addListener(async (command) => {
     // Content script isn't present (page predates install/update). Inject it,
     // then toggle. Falls back to a new tab if even that fails.
     try {
-      await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['src/content/index.ts'] })
+      const file = chrome.runtime.getManifest().content_scripts?.[0]?.js?.[0]
+      if (!file) throw new Error('no content script in manifest')
+      await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: [file] })
       await chrome.tabs.sendMessage(tab.id, { type: 'TOGGLE_OVERLAY' })
     } catch {
       await chrome.tabs.create({})
