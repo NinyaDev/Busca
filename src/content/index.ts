@@ -1,6 +1,7 @@
 import { signal } from '@preact/signals'
 import type { ActionDescriptor, CommandItem } from '../shared/types'
 import { sendMessage } from '../shared/messaging'
+import { DEFAULT_PREFS, loadPrefs, onPrefsChanged, type Prefs } from '../shared/prefs'
 import { mountInto } from './mount'
 // `?inline` gives us the compiled CSS as a string so we can adopt it into the
 // shadow root (no <style> injection into the host page).
@@ -10,6 +11,7 @@ import '@fontsource-variable/geist-mono'
 
 const open = signal(false)
 const items = signal<CommandItem[]>([])
+const prefs = signal<Prefs>(DEFAULT_PREFS)
 
 let host: HTMLElement | null = null
 
@@ -34,6 +36,7 @@ function ensureHost() {
   mountInto(shadow, {
     open,
     items,
+    prefs,
     host,
     onExec: (action: ActionDescriptor, opts) => {
       void sendMessage({ type: 'EXEC', descriptor: action, newTab: opts.newTab })
@@ -74,3 +77,5 @@ ensureHost()
 // Warm the snapshot now so the first Cmd+K already shows your most-used sites
 // (same empty state as the new tab) instead of flashing a tools-only list.
 void refreshItems()
+loadPrefs().then((p) => (prefs.value = p))
+onPrefsChanged((p) => (prefs.value = p))

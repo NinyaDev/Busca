@@ -4,6 +4,7 @@ import { Palette } from '../core/Palette'
 import { GoogleApps } from './GoogleApps'
 import type { ActionDescriptor, CommandItem } from '../shared/types'
 import { sendMessage } from '../shared/messaging'
+import { DEFAULT_PREFS, loadPrefs, onPrefsChanged } from '../shared/prefs'
 import '@fontsource-variable/hanken-grotesk'
 import '@fontsource-variable/geist-mono'
 import '../core/palette.css'
@@ -23,6 +24,7 @@ function exec(action: ActionDescriptor, opts: { newTab: boolean }) {
 
 function App() {
   const [items, setItems] = useState<CommandItem[]>([])
+  const [prefs, setPrefs] = useState(DEFAULT_PREFS)
 
   // Render the shell instantly; fill results when the snapshot arrives.
   useEffect(() => {
@@ -31,6 +33,8 @@ function App() {
         if (r && (r as { type?: string }).type === 'SNAPSHOT') setItems((r as { items: CommandItem[] }).items)
       })
       .catch(() => {})
+    loadPrefs().then(setPrefs)
+    onPrefsChanged(setPrefs)
   }, [])
 
   return (
@@ -39,11 +43,12 @@ function App() {
         baseItems={items}
         autoFocus
         variant="newtab"
+        prefs={prefs}
         onExec={exec}
         // On the NTP the palette *is* the page; closing just refocuses the input.
         onClose={() => document.querySelector<HTMLInputElement>('.cp-input')?.focus()}
       />
-      <GoogleApps />
+      {prefs.showGoogleApps && <GoogleApps />}
     </>
   )
 }

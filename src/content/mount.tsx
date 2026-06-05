@@ -3,10 +3,12 @@ import { useEffect } from 'preact/hooks'
 import type { Signal } from '@preact/signals'
 import { Palette } from '../core/Palette'
 import type { ActionDescriptor, CommandItem } from '../shared/types'
+import type { Prefs } from '../shared/prefs'
 
 export interface MountOpts {
   open: Signal<boolean>
   items: Signal<CommandItem[]>
+  prefs: Signal<Prefs>
   host: HTMLElement
   onExec: (action: ActionDescriptor, opts: { newTab: boolean }) => void
   onClose: () => void
@@ -23,7 +25,15 @@ export function mountInto(shadow: ShadowRoot, o: MountOpts) {
       o.host.style.pointerEvents = isOpen ? 'auto' : 'none'
     }, [isOpen])
     if (!isOpen) return null
-    return <Palette baseItems={o.items.value} autoFocus onExec={o.onExec} onClose={o.onClose} />
+    return (
+      <Palette
+        baseItems={o.items.value}
+        autoFocus
+        prefs={o.prefs.value}
+        onExec={o.onExec}
+        onClose={o.onClose}
+      />
+    )
   }
   render(<Root />, shadow)
 }
