@@ -1,86 +1,114 @@
+<div align="center">
+
 # Busca
 
-**Busca** ("search") is a fast, keyboard-first command palette for Chrome - Raycast/Spotlight for the browser, with a developer bent and a soft lavender identity. Built on the **hybrid trigger strategy**:
+**A fast, keyboard-first command palette for Google Chrome.**
 
-- **Cmd+T / Ctrl+T** → opens the palette as the **New Tab Page** (we override the NTP; Chrome reserves Cmd+T so this is the only sanctioned way to land it there).
-- **Cmd+K / Ctrl+K** → opens the **same palette as an overlay** on whatever page you're on (Shadow-DOM isolated, blurs the live page behind it).
+Search your tabs, history, and bookmarks, run quick actions, and jump anywhere — without touching the mouse.
 
-> Why not bind Cmd+T directly? Chrome treats Cmd+T as a reserved "new tab" accelerator - it can't be captured by `chrome.commands`, the shortcuts UI, or a content-script `keydown`. We don't fight it; we own the page that Cmd+T already opens.
+![Chrome Web Store — Coming soon](https://img.shields.io/badge/Chrome%20Web%20Store-Coming%20soon-aba0c8?logo=googlechrome&logoColor=white)
 
-## Stack
+</div>
 
-Preact + `@preact/signals` · hand-authored CSS (adopted stylesheet, px units) · Hanken Grotesk + Geist Mono (bundled via `@fontsource`) · Tailwind (wired up for future settings UI) · [uFuzzy](https://github.com/leeoniya/uFuzzy) for matching · Vite + `@crxjs/vite-plugin` (MV3) · TypeScript.
+---
 
-## Getting started
+## Features
 
+One palette, two ways to open it:
+
+| Trigger | What it does |
+| --- | --- |
+| **Cmd+T / Ctrl+T** | Opens Busca as your new tab page |
+| **Cmd+K / Ctrl+K** | Opens Busca as an overlay on any page |
+
+- **Unified fuzzy search** across open tabs, history, and bookmarks — ranked omnibox-style so your most-used result lands first, with inline autocomplete.
+- **Paste-to-navigate** — paste a URL and press Enter to go straight there, just like the address bar.
+- **Bangs** — type `/` for a picker (`/g` Google, `/y` YouTube, `/w` Wikipedia, `/gh` GitHub, `/so`, `/npm`, `/mdn`, `/ddg`), or add your own.
+- **Quick actions** — clear cache (last 24h, or cache + cookies for the current site), reopen the last closed tab, duplicate or mute the current tab, open Chrome pages, a new incognito window, and more.
+- **Google apps launcher** on the new tab (Gmail, Drive, Docs, Sheets, Calendar…).
+- **Real favicons** on every result and bang.
+- **Preferences page** — accent color, the empty-state layout, which tools appear, and custom bangs — synced across your Chrome.
+
+---
+
+## Tech stack
+
+- **[Preact](https://preactjs.com/)** + **@preact/signals** — tiny, fast UI
+- **TypeScript**
+- **[uFuzzy](https://github.com/leeoniya/uFuzzy)** — fuzzy matching
+- Hand-authored CSS rendered in a **Shadow DOM** overlay (host-page styles can't break it), with **Hanken Grotesk** + **Geist Mono** bundled
+- **Vite** + **[@crxjs/vite-plugin](https://crxjs.dev/)** — Manifest V3 build
+- **chrome.storage.sync** for preferences
+
+---
+
+## Local development
+
+### 1. Prerequisites
+- [Node.js](https://nodejs.org/) 18+ and npm
+
+### 2. Clone and install
 ```bash
+git clone https://github.com/NinyaDev/Busca.git
+cd Busca
 npm install
-npm run dev      # development build with HMR, writes to dist/
-# (or) npm run build   # production build
 ```
 
-Then load it in Chrome:
+### 3. Build the extension
+```bash
+npm run build
+```
+Use `npm run dev` instead for a hot-reloading build while developing.
 
-1. Go to `chrome://extensions`
+### 4. Load it in Chrome
+1. Open `chrome://extensions`
 2. Enable **Developer mode** (top-right)
 3. Click **Load unpacked** and select the **`dist/`** folder
-4. Open a new tab (**Cmd+T**) → the palette is your new tab page
-5. On any normal web page, press **Cmd+K / Ctrl+K** → the overlay appears
+4. Press **Cmd+T / Ctrl+T** for the new tab, or **Cmd+K / Ctrl+K** on any page
 
-> After the first `npm run dev`, keep it running; @crxjs reloads the extension on change. If you hard-edit the manifest, click the refresh icon on the extension card.
+> [!IMPORTANT]
+> Load the **`npm run build`** output. The `npm run dev` build streams from a local dev server and stops working once that server is closed.
 
-## Architecture
+---
 
-One palette **core**, two thin **adapters** - the core never knows which surface it's on.
+## Project structure
 
 ```
 src/
-  shared/          # contracts shared by every context
-    types.ts         CommandItem + ActionDescriptor (the universal result shape)
-    messaging.ts     typed runtime messages
-    bangs.ts         default bang registry (/y /w /gh …) + parser
-    actions.ts       quick-action metadata (clear cache, duplicate tab, …)
-  core/            # the shared, surface-agnostic palette
-    Palette.tsx      the component (input, list, keyboard nav, confirm-on-danger)
-    search.ts        uFuzzy matching + score blend
-    items.ts         builds bang/web-search/action items + final result list
-    palette.css      the look (adopted into the overlay's shadow root)
-  background/      # the privileged service worker
-    index.ts         Cmd+K command handler + message router
-    snapshot.ts      builds tabs+history+bookmarks item pool
-    exec.ts          THE single action executor (open url, switch tab, quick actions)
-  newtab/          # Cmd+T adapter - palette as the New Tab Page
-    index.html, main.tsx
-  content/         # Cmd+K adapter - palette as a Shadow-DOM overlay
-    index.ts         host + signals + toggle plumbing (no JSX)
-    mount.tsx        renders Palette into the shadow root
-manifest.config.ts # MV3 manifest (permissions justified inline)
+  shared/      types, messaging, bangs, quick actions, preferences
+  core/        the palette UI — search, ranking, icons, styling
+  background/  service worker — builds the search index, runs actions
+  newtab/      new-tab adapter (Cmd+T) + Google apps launcher
+  content/     overlay adapter (Cmd+K)
+  options/     the preferences page
+manifest.config.ts
 ```
 
-**Execution model.** Everything in the list is a `CommandItem` with a serializable `action`. On Enter, both adapters send that action to the service worker's single `execAction` - so "switch tab", "clear cache", "open url" live in exactly one place. Cmd/Ctrl+Enter forces "open in new tab".
+It's intentionally simple: one palette component mounted on two surfaces, and one service worker that builds the search index and runs every action.
 
-## What works today (P0)
+---
 
-- Hybrid trigger (NTP + Cmd+K overlay), same component on both
-- Unified fuzzy search across **open tabs · history · bookmarks** (deduped, badged, recency-boosted)
-- **Bangs**: `/y` `/w` `/g` `/gh` `/so` `/npm` `/mdn` `/ddg` (bare form works too, e.g. `y cats`)
-- Web-search fallback for any query
-- **Quick actions**: duplicate tab, **clear cache (last 24h)**, clear cache+cookies for this site, reopen last closed, mute/unmute, open chrome:// pages, new incognito - destructive ones require a confirm press
+## Privacy
 
-## Roadmap (deferred, by design)
+Busca is **100% local**. There is no backend, no analytics, and no telemetry.
 
-- **P1 - perf & freshness:** cache the snapshot in the service worker + persist to **IndexedDB**, refresh incrementally via `tabs/history/bookmarks` events (today it rebuilds per open - fast, but not yet restart-cached). Match-highlighting of matched characters. rem→px PostCSS transform if/when we use Tailwind utilities inside the overlay. Learned-pick frecency boost.
-- **P1 - clipboard actions:** copy URL / copy as Markdown / copy as curl (need page-context clipboard, not the SW).
-- **P2 - developer features:** localhost/dev-server radar (port detection), clipboard-aware smart paste (JWT/JSON/PR jumps), project sessions + environment switcher, user-editable bangs & bang packs, settings UI.
+- Your tabs, history, and bookmarks are read on-device to power search and **never leave your machine**.
+- Favicons come from Chrome's own local cache.
+- Preferences are stored with `chrome.storage.sync` — kept on your device and synced through **your own Chrome account**, never to any server we control.
+- The only network requests are the ones **you** trigger by opening a result or running a search — i.e. ordinary browsing.
 
-## Known limitations (Chrome constraints, not bugs)
+---
 
-- The NTP palette can't overlay an *existing* page (that's what Cmd+K is for); it doesn't run in incognito; only one extension can own the new tab page.
-- The overlay can't inject on `chrome://`, the Web Store, or the PDF viewer - there, Cmd+K falls back to opening a new-tab palette.
-- Favicons render reliably on the NTP; inside the overlay some sites' CSP may block the `_favicon` image (it degrades to a glyph). P1 will address this.
+## License
 
-## Still needed from you
+[MIT](LICENSE)
 
-- **App icons:** named **Busca** now, with a lavender identity. Still need 16/48/128px PNG app icons (or approve generated lavender placeholders) for the manifest `icons`/`action.default_icon`.
-- **Auto-focus preference:** the NTP uses the `?focus` reload trick (tiny blink). Say the word if you'd rather use first-keystroke focus (no blink, one extra key).
-- Nothing else is blocking: **no Google Cloud Console / OAuth and no API keys** are required for this feature set.
+---
+
+## Contact
+
+**Adrian Ninanya**
+
+* **GitHub:** [NinyaDev](https://github.com/NinyaDev)
+* **LinkedIn:** [Adrian Ninanya](https://www.linkedin.com/in/adrian-ninanya/)
+* **Project Link:** [https://github.com/NinyaDev/Busca](https://github.com/NinyaDev/Busca)
