@@ -44,14 +44,20 @@ function getCompletion(query: string, top: CommandItem | undefined): string {
   return ''
 }
 
-// Favicon when we have one, falling back to the line icon if it fails to load
-// (some sites' CSP can block the _favicon image inside the overlay).
+// Show the line icon until the favicon actually loads, then swap to it. This is
+// robust even where the favicon is blocked (e.g. some sites' CSP in the overlay):
+// a blocked image never fires onLoad, so the line icon simply stays. The <img>
+// still loads while hidden, so real favicons appear with no broken-image flash.
 function ResultIcon({ item }: { item: CommandItem }) {
-  const [broken, setBroken] = useState(false)
-  if (item.iconUrl && !broken) {
-    return <img class="cp-favicon" src={item.iconUrl} alt="" onError={() => setBroken(true)} />
-  }
-  return <Icon name={item.iconName} />
+  const [loaded, setLoaded] = useState(false)
+  return (
+    <>
+      {!loaded && <Icon name={item.iconName} />}
+      {item.iconUrl && (
+        <img class="cp-favicon" src={item.iconUrl} alt="" hidden={!loaded} onLoad={() => setLoaded(true)} />
+      )}
+    </>
+  )
 }
 
 // The shared palette. Pure and surface-agnostic: it knows nothing about whether
