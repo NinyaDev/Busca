@@ -71,3 +71,6 @@ chrome.runtime.onMessage.addListener((msg: { type?: string }) => {
 })
 
 ensureHost()
+// Warm the snapshot now so the first Cmd+K already shows your most-used sites
+// (same empty state as the new tab) instead of flashing a tools-only list.
+void refreshItems()
