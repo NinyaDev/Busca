@@ -13,6 +13,14 @@ export function Options() {
     loadPrefs().then(setPrefs)
   }, [])
 
+  // Recolor the whole preferences page to the selected accent (live).
+  useEffect(() => {
+    if (prefs) {
+      const a = ACCENTS[prefs.accent] ?? ACCENTS.lavender
+      document.documentElement.style.setProperty('--op-accent', a.accent)
+    }
+  }, [prefs?.accent])
+
   if (!prefs) return null
   const p = prefs
 

@@ -257,7 +257,8 @@
   align-items: center;
   justify-content: flex-start;
   padding-top: 16vh;
-  background: radial-gradient(760px 440px at 50% 32%, rgba(171, 160, 200, 0.06), transparent 72%);
+  /* the bloom tints to the selected accent (driven by --cp-accent) */
+  background: radial-gradient(760px 440px at 50% 32%, color-mix(in srgb, var(--cp-accent) 14%, transparent), transparent 72%);
 }
 .cp-root--newtab .cp-backdrop {
   background: transparent;
