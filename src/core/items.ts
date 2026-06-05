@@ -57,7 +57,7 @@ function webSearchItem(query: string): CommandItem {
 
 /**
  * Compose the final result list:
- *   - empty query  -> the quick-action tools (not the whole history)
+ *   - empty query  -> most-used sites/tabs first, then a few key tools
  *   - with a query -> [explicit bang] [top match] [web search] [rest of matches]
  * The top match is auto-selected, so Enter goes straight to it (omnibox feel).
  */
@@ -69,8 +69,23 @@ export function buildResults(
 ): CommandItem[] {
   const q = query.trim()
 
-  // Empty state: show the tools/quick-actions, not the whole history.
-  if (!q) return actionItems
+  // Empty state: lead with the most-used sites/tabs, then a few key tools. The
+  // full tool list and full history surface as soon as you start typing.
+  if (!q) {
+    const topSites = baseItems
+      .slice()
+      .sort((a, b) => b.baseScore - a.baseScore)
+      .slice(0, 6)
+    const tools = actionItems.slice(0, 4)
+    const seen = new Set<string>()
+    const out: CommandItem[] = []
+    for (const it of [...topSites, ...tools]) {
+      if (seen.has(it.id)) continue
+      seen.add(it.id)
+      out.push(it)
+    }
+    return out
+  }
 
   const matched = searchFn([...baseItems, ...actionItems], q)
   const ordered: CommandItem[] = []
