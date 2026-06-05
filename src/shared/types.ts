@@ -2,7 +2,7 @@
 // a bookmark, a bang, or a quick action. The palette fuzzy-matches over a pile
 // of these and runs `action` on Enter. It never cares what `kind` something is.
 
-export type ItemKind = 'tab' | 'history' | 'bookmark' | 'bang' | 'action' | 'search'
+export type ItemKind = 'tab' | 'history' | 'bookmark' | 'bang' | 'action' | 'search' | 'url'
 
 // Actions are *serializable descriptors* (not functions) because items cross the
 // messaging boundary between the service worker and the UI. A single executor in
@@ -11,6 +11,9 @@ export type ActionDescriptor =
   | { type: 'open-url'; url: string; where?: 'current' | 'newtab' }
   | { type: 'switch-tab'; tabId: number; windowId: number }
   | { type: 'quick-action'; actionId: string; args?: Record<string, unknown> }
+  // Client-side only (handled in the palette, never sent to the worker): replace
+  // the query text - used by the bang picker to drop "/token " into the input.
+  | { type: 'fill'; text: string }
 
 export interface CommandItem {
   id: string
@@ -38,4 +41,5 @@ export const SOURCE_WEIGHT: Record<ItemKind, number> = {
   bang: 1.2,
   action: 1.1,
   search: 0.5,
+  url: 1.5,
 }

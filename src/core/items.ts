@@ -55,11 +55,62 @@ function webSearchItem(query: string): CommandItem {
   }
 }
 
+// A direct-navigation row when the query looks like a URL or domain - paste a
+// link and hit Enter to go there, like the address bar (no detour via search).
+function parseUrl(raw: string): string | null {
+  const q = raw.trim()
+  if (!q || /\s/.test(q)) return null
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(q)) return q // explicit scheme (http://, etc.)
+  if (/^(localhost|\d{1,3}(\.\d{1,3}){3})(:\d+)?(\/.*)?$/i.test(q)) return 'http://' + q
+  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?(\/.*)?$/i.test(q) && /\.[a-z]{2,}([:/]|$)/i.test(q)) {
+    return 'https://' + q
+  }
+  return null
+}
+
+function goToItem(url: string): CommandItem {
+  let label = url
+  try {
+    const u = new URL(url)
+    label = u.host + (u.pathname === '/' ? '' : u.pathname)
+  } catch {
+    /* keep the raw string */
+  }
+  return {
+    id: 'go:url',
+    kind: 'url',
+    title: `Go to ${label}`,
+    subtitle: url,
+    iconName: 'globe',
+    matchText: url,
+    baseScore: 6,
+    action: { type: 'open-url', url, where: 'current' },
+  }
+}
+
+// Bang-picker rows shown while typing the token (before a query). Selecting one
+// fills "/token " into the input so you can then type the search.
+function bangPickerItems(prefix: string): CommandItem[] {
+  const typed = prefix.slice(1).toLowerCase()
+  return DEFAULT_BANGS.filter((b) => typed === '' || b.token.startsWith(typed)).map((b) => ({
+    id: `pick:${b.token}`,
+    kind: 'bang' as const,
+    title: `/${b.token}`,
+    subtitle: `Search ${b.label}`,
+    iconName: 'search',
+    matchText: `/${b.token} ${b.label}`,
+    baseScore: 1,
+    action: { type: 'fill', text: `/${b.token} ` },
+  }))
+}
+
 /**
  * Compose the final result list:
- *   - empty query  -> most-used sites/tabs first, then a few key tools
- *   - with a query -> [explicit bang] [top match] [web search] [rest of matches]
- * The top match is auto-selected, so Enter goes straight to it (omnibox feel).
+ *   - empty query      -> most-used sites/tabs first, then a few key tools
+ *   - "/" prefix       -> a picker of the available bangs (/g /y /w /gh ...)
+ *   - looks like a URL -> a "Go to <url>" row at the top (paste a link, hit Enter)
+ *   - otherwise        -> [bang] [top match] [web search] [rest of matches]
+ * The top row is auto-selected, so Enter goes straight to it (omnibox feel).
  */
 export function buildResults(
   query: string,
@@ -87,11 +138,25 @@ export function buildResults(
     return out
   }
 
+  // Bang picker: while typing the token (a leading "/" with no query yet), list
+  // the available bangs. Picking one fills "/token " into the input.
+  if (q.startsWith('/')) {
+    const token = q.slice(1).split(' ')[0]
+    const afterSpace = q.includes(' ') ? q.slice(q.indexOf(' ') + 1).trim() : ''
+    if (!q.includes(' ') || afterSpace === '') {
+      const picks = bangPickerItems('/' + token)
+      if (picks.length) return picks
+    }
+  }
+
   const matched = searchFn([...baseItems, ...actionItems], q)
   const ordered: CommandItem[] = []
 
+  // Direct navigation when the query looks like a URL/domain (paste a link).
+  const url = parseUrl(q)
   const bang = bangItem(q)
-  if (bang) ordered.push(bang)
+  if (url) ordered.push(goToItem(url))
+  else if (bang) ordered.push(bang)
 
   // Top real match first, then web-search as the SECOND option, then the rest.
   if (matched.length > 0) {

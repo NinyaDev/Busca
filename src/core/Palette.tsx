@@ -102,6 +102,12 @@ export function Palette({
   }, [sel])
 
   function exec(item: CommandItem, newTab: boolean) {
+    // Bang picker: replace the query and stay open so the user can type the search.
+    if (item.action.type === 'fill') {
+      setQuery(item.action.text)
+      inputRef.current?.focus()
+      return
+    }
     // Destructive actions ask for one confirmation press before running.
     if (item.badges?.includes('danger') && confirmId !== item.id) {
       setConfirmId(item.id)
