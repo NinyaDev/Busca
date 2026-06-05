@@ -40,7 +40,13 @@ export default defineManifest({
   ],
 
   action: {
-    default_title: 'Open Busca',
+    default_title: 'Busca preferences',
+  },
+
+  // Clicking the toolbar icon opens this page (wired in chrome.action.onClicked).
+  options_ui: {
+    page: 'src/options/index.html',
+    open_in_tab: true,
   },
 
   permissions: [

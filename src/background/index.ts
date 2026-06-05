@@ -2,6 +2,11 @@ import type { Message } from '../shared/messaging'
 import { buildSnapshot } from './snapshot'
 import { execAction } from './exec'
 
+// Clicking the toolbar icon opens the preferences page.
+chrome.action.onClicked.addListener(() => {
+  void chrome.runtime.openOptionsPage()
+})
+
 // Pages where a content script can't run, so the overlay can't appear. On these
 // we fall back to opening a fresh tab (which IS our palette via the NTP override).
 function isInjectable(url?: string): boolean {

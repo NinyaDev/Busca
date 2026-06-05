@@ -1,0 +1,189 @@
+:root {
+  --op-bg: #0e0d11;
+  --op-panel: #181620;
+  --op-border: rgba(255, 255, 255, 0.08);
+  --op-text: #e8e6ec;
+  --op-muted: #9894a1;
+  --op-accent: #aba0c8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--op-bg);
+  color: var(--op-text);
+  font-family: 'Hanken Grotesk Variable', system-ui, -apple-system, sans-serif;
+}
+
+.op {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+}
+
+.op-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.op-mark {
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--op-accent);
+}
+.op-sub {
+  color: var(--op-muted);
+}
+
+.op-sec {
+  border-top: 1px solid var(--op-border);
+  padding: 22px 0;
+}
+.op-sec h2 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 14px;
+}
+
+.op-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+.op-num {
+  font-family: 'Geist Mono Variable', ui-monospace, monospace;
+  color: var(--op-accent);
+  min-width: 16px;
+}
+.op-hint {
+  color: var(--op-muted);
+  font-size: 13px;
+  margin: 4px 0 10px;
+}
+
+.op-tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.op-swatches {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.op-swatch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--op-border);
+  background: var(--op-panel);
+  color: var(--op-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+.op-swatch--on {
+  border-color: var(--op-accent);
+}
+.op-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.op-banglist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.op-bang {
+  display: grid;
+  grid-template-columns: 56px 120px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--op-panel);
+  border: 1px solid var(--op-border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+.op-tok {
+  font-family: 'Geist Mono Variable', ui-monospace, monospace;
+  color: var(--op-accent);
+}
+.op-url {
+  color: var(--op-muted);
+  font-family: 'Geist Mono Variable', ui-monospace, monospace;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.op-add {
+  display: grid;
+  grid-template-columns: 90px 140px 1fr auto;
+  gap: 8px;
+}
+.op-add input {
+  background: var(--op-panel);
+  border: 1px solid var(--op-border);
+  border-radius: 8px;
+  color: var(--op-text);
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+}
+.op-add input:focus {
+  outline: none;
+  border-color: var(--op-accent);
+}
+
+.op-add button,
+.op-x {
+  background: rgba(171, 160, 200, 0.16);
+  color: var(--op-accent);
+  border: 1px solid var(--op-border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+.op-x {
+  background: transparent;
+  color: var(--op-muted);
+  padding: 4px 8px;
+}
+.op-x:hover {
+  color: #d98e8e;
+}
+
+code {
+  font-family: 'Geist Mono Variable', ui-monospace, monospace;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+input[type='checkbox'] {
+  accent-color: var(--op-accent);
+  width: 15px;
+  height: 15px;
+}
+input[type='range'] {
+  accent-color: var(--op-accent);
+}
