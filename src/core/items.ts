@@ -1,9 +1,10 @@
 import type { CommandItem } from '../shared/types'
-import { DEFAULT_BANGS, parseBang, fillBang } from '../shared/bangs'
+import type { Prefs } from '../shared/prefs'
+import { DEFAULT_BANGS, parseBang, fillBang, type Bang } from '../shared/bangs'
 import { QUICK_ACTIONS } from '../shared/actions'
 
-// Quick actions are static, query-independent items that flow through the normal
-// fuzzy pool (type "cache" to find "Clear cache"). Built once.
+// All quick actions as searchable items. Always available via search; the empty
+// state shows only a chosen subset (prefs.emptyTools).
 export function buildActionItems(): CommandItem[] {
   return QUICK_ACTIONS.map((a) => ({
     id: `action:${a.id}`,
@@ -18,18 +19,30 @@ export function buildActionItems(): CommandItem[] {
   }))
 }
 
-// An explicit bang row, shown at the very top - only when the user deliberately
-// starts the query with "/" (e.g. "/y cats"). Bare words never trigger it, so
-// typing "youtube" still ranks the real youtube.com match first.
-function bangItem(query: string): CommandItem | null {
+// Favicon URL for a site via Chrome's cached _favicon endpoint (works in both the
+// new-tab page and the overlay - see the web_accessible_resources entry).
+function faviconFor(siteUrl: string): string | undefined {
+  try {
+    const u = new URL(chrome.runtime.getURL('/_favicon/'))
+    u.searchParams.set('pageUrl', new URL(siteUrl).origin)
+    u.searchParams.set('size', '32')
+    return u.toString()
+  } catch {
+    return undefined
+  }
+}
+
+// An explicit bang row, shown at the top - only when the query starts with "/".
+function bangItem(query: string, bangs: Bang[]): CommandItem | null {
   if (!query.startsWith('/')) return null
-  const parsed = parseBang(query, DEFAULT_BANGS)
+  const parsed = parseBang(query, bangs)
   if (!parsed) return null
   return {
     id: `bang:${parsed.bang.token}`,
     kind: 'bang',
     title: `${parsed.bang.label}: ${parsed.query}`,
     subtitle: `Search ${parsed.bang.label}`,
+    iconUrl: faviconFor(parsed.bang.url),
     iconName: 'search',
     matchText: query,
     baseScore: 5,
@@ -37,8 +50,7 @@ function bangItem(query: string): CommandItem | null {
   }
 }
 
-// The web-search fallback. It lives at the BOTTOM of the list so it's always
-// available but never steals the default selection from a real result.
+// The web-search fallback - second when there are real matches, otherwise top.
 function webSearchItem(query: string): CommandItem {
   return {
     id: 'search:web',
@@ -68,19 +80,6 @@ function parseUrl(raw: string): string | null {
   return null
 }
 
-// Favicon URL for a site via Chrome's cached _favicon endpoint (works in both the
-// new-tab page and the overlay - see the web_accessible_resources entry).
-function faviconFor(siteUrl: string): string | undefined {
-  try {
-    const u = new URL(chrome.runtime.getURL('/_favicon/'))
-    u.searchParams.set('pageUrl', new URL(siteUrl).origin)
-    u.searchParams.set('size', '32')
-    return u.toString()
-  } catch {
-    return undefined
-  }
-}
-
 function goToItem(url: string): CommandItem {
   let label = url
   try {
@@ -104,24 +103,26 @@ function goToItem(url: string): CommandItem {
 
 // Bang-picker rows shown while typing the token (before a query). Selecting one
 // fills "/token " into the input so you can then type the search.
-function bangPickerItems(prefix: string): CommandItem[] {
+function bangPickerItems(prefix: string, bangs: Bang[]): CommandItem[] {
   const typed = prefix.slice(1).toLowerCase()
-  return DEFAULT_BANGS.filter((b) => typed === '' || b.token.startsWith(typed)).map((b) => ({
-    id: `pick:${b.token}`,
-    kind: 'bang' as const,
-    title: `/${b.token}`,
-    subtitle: `Search ${b.label}`,
-    iconUrl: faviconFor(b.url),
-    iconName: 'search',
-    matchText: `/${b.token} ${b.label}`,
-    baseScore: 1,
-    action: { type: 'fill', text: `/${b.token} ` },
-  }))
+  return bangs
+    .filter((b) => typed === '' || b.token.startsWith(typed))
+    .map((b) => ({
+      id: `pick:${b.token}`,
+      kind: 'bang' as const,
+      title: `/${b.token}`,
+      subtitle: `Search ${b.label}`,
+      iconUrl: faviconFor(b.url),
+      iconName: 'search',
+      matchText: `/${b.token} ${b.label}`,
+      baseScore: 1,
+      action: { type: 'fill', text: `/${b.token} ` },
+    }))
 }
 
 /**
  * Compose the final result list:
- *   - empty query      -> most-used sites/tabs first, then a few key tools
+ *   - empty query      -> most-used sites (prefs.recentsCount) + chosen tools
  *   - "/" prefix       -> a picker of the available bangs (/g /y /w /gh ...)
  *   - looks like a URL -> a "Go to <url>" row at the top (paste a link, hit Enter)
  *   - otherwise        -> [bang] [top match] [web search] [rest of matches]
@@ -132,17 +133,20 @@ export function buildResults(
   baseItems: CommandItem[],
   actionItems: CommandItem[],
   searchFn: (items: CommandItem[], q: string) => CommandItem[],
+  prefs: Prefs,
 ): CommandItem[] {
   const q = query.trim()
+  const bangs = [...DEFAULT_BANGS, ...prefs.customBangs]
 
-  // Empty state: lead with the most-used sites/tabs, then a few key tools. The
-  // full tool list and full history surface as soon as you start typing.
+  // Empty state: most-used sites first, then the chosen tools.
   if (!q) {
     const topSites = baseItems
       .slice()
       .sort((a, b) => b.baseScore - a.baseScore)
-      .slice(0, 6)
-    const tools = actionItems.slice(0, 4)
+      .slice(0, prefs.recentsCount)
+    const tools = prefs.emptyTools
+      .map((id) => actionItems.find((a) => a.id === `action:${id}`))
+      .filter((x): x is CommandItem => Boolean(x))
     const seen = new Set<string>()
     const out: CommandItem[] = []
     for (const it of [...topSites, ...tools]) {
@@ -153,13 +157,12 @@ export function buildResults(
     return out
   }
 
-  // Bang picker: while typing the token (a leading "/" with no query yet), list
-  // the available bangs. Picking one fills "/token " into the input.
+  // Bang picker: while typing the token (a leading "/" with no query yet).
   if (q.startsWith('/')) {
     const token = q.slice(1).split(' ')[0]
     const afterSpace = q.includes(' ') ? q.slice(q.indexOf(' ') + 1).trim() : ''
     if (!q.includes(' ') || afterSpace === '') {
-      const picks = bangPickerItems('/' + token)
+      const picks = bangPickerItems('/' + token, bangs)
       if (picks.length) return picks
     }
   }
@@ -167,13 +170,11 @@ export function buildResults(
   const matched = searchFn([...baseItems, ...actionItems], q)
   const ordered: CommandItem[] = []
 
-  // Direct navigation when the query looks like a URL/domain (paste a link).
   const url = parseUrl(q)
-  const bang = bangItem(q)
+  const bang = bangItem(q, bangs)
   if (url) ordered.push(goToItem(url))
   else if (bang) ordered.push(bang)
 
-  // Top real match first, then web-search as the SECOND option, then the rest.
   if (matched.length > 0) {
     ordered.push(matched[0], webSearchItem(q), ...matched.slice(1))
   } else {

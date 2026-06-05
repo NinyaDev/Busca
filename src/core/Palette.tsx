@@ -4,6 +4,7 @@ import type { CommandItem, ActionDescriptor } from '../shared/types'
 import { searchItems } from './search'
 import { buildActionItems, buildResults } from './items'
 import { Icon } from './icons'
+import { DEFAULT_PREFS, accentStyle, type Prefs } from '../shared/prefs'
 
 export interface PaletteProps {
   /** Tabs/history/bookmarks snapshot from the service worker. */
@@ -16,6 +17,8 @@ export interface PaletteProps {
   placeholder?: string
   /** 'newtab' shows the wordmark and a transparent backdrop (the page paints the bg). */
   variant?: 'overlay' | 'newtab'
+  /** User preferences (accent, empty-state, custom bangs). */
+  prefs?: Prefs
 }
 
 function hostOf(item: CommandItem): string {
@@ -70,6 +73,7 @@ export function Palette({
   autoFocus = true,
   placeholder,
   variant = 'overlay',
+  prefs = DEFAULT_PREFS,
 }: PaletteProps) {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(0)
@@ -79,8 +83,8 @@ export function Palette({
 
   const actionItems = useMemo(() => buildActionItems(), [])
   const results = useMemo(
-    () => buildResults(query, baseItems, actionItems, searchItems),
-    [query, baseItems, actionItems],
+    () => buildResults(query, baseItems, actionItems, searchItems, prefs),
+    [query, baseItems, actionItems, prefs],
   )
 
   const sel = Math.min(selected, Math.max(0, results.length - 1))
@@ -142,7 +146,11 @@ export function Palette({
   }
 
   return (
-    <div class={`cp-root ${variant === 'newtab' ? 'cp-root--newtab' : ''}`} onKeyDown={onKeyDown}>
+    <div
+      class={`cp-root ${variant === 'newtab' ? 'cp-root--newtab' : ''}`}
+      style={accentStyle(prefs.accent)}
+      onKeyDown={onKeyDown}
+    >
       <div class="cp-backdrop" onClick={onClose} />
       <div class="cp-panel" role="dialog" aria-modal="true">
         <div class="cp-input-wrap">
