@@ -68,6 +68,19 @@ function parseUrl(raw: string): string | null {
   return null
 }
 
+// Favicon URL for a site via Chrome's cached _favicon endpoint (works in both the
+// new-tab page and the overlay - see the web_accessible_resources entry).
+function faviconFor(siteUrl: string): string | undefined {
+  try {
+    const u = new URL(chrome.runtime.getURL('/_favicon/'))
+    u.searchParams.set('pageUrl', new URL(siteUrl).origin)
+    u.searchParams.set('size', '32')
+    return u.toString()
+  } catch {
+    return undefined
+  }
+}
+
 function goToItem(url: string): CommandItem {
   let label = url
   try {
@@ -81,6 +94,7 @@ function goToItem(url: string): CommandItem {
     kind: 'url',
     title: `Go to ${label}`,
     subtitle: url,
+    iconUrl: faviconFor(url),
     iconName: 'globe',
     matchText: url,
     baseScore: 6,
@@ -97,6 +111,7 @@ function bangPickerItems(prefix: string): CommandItem[] {
     kind: 'bang' as const,
     title: `/${b.token}`,
     subtitle: `Search ${b.label}`,
+    iconUrl: faviconFor(b.url),
     iconName: 'search',
     matchText: `/${b.token} ${b.label}`,
     baseScore: 1,
