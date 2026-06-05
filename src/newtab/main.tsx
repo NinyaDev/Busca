@@ -1,6 +1,7 @@
 import { render } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import { Palette } from '../core/Palette'
+import { GoogleApps } from './GoogleApps'
 import type { ActionDescriptor, CommandItem } from '../shared/types'
 import { sendMessage } from '../shared/messaging'
 import '@fontsource-variable/hanken-grotesk'
@@ -33,14 +34,17 @@ function App() {
   }, [])
 
   return (
-    <Palette
-      baseItems={items}
-      autoFocus
-      variant="newtab"
-      onExec={exec}
-      // On the NTP the palette *is* the page; closing just refocuses the input.
-      onClose={() => document.querySelector<HTMLInputElement>('.cp-input')?.focus()}
-    />
+    <>
+      <Palette
+        baseItems={items}
+        autoFocus
+        variant="newtab"
+        onExec={exec}
+        // On the NTP the palette *is* the page; closing just refocuses the input.
+        onClose={() => document.querySelector<HTMLInputElement>('.cp-input')?.focus()}
+      />
+      <GoogleApps />
+    </>
   )
 }
 
