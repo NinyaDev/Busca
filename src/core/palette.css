@@ -294,17 +294,19 @@
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  border: 1px solid var(--cp-border-strong);
-  background: var(--cp-panel);
-  color: var(--cp-text);
+  /* lighter charcoal fill + a bright ring so it stands out on the near-black page */
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(40, 38, 47, 0.92);
+  color: #f2f0f6;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-  transition: transform 120ms ease, border-color 120ms ease;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5);
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
 }
 .ga-btn:hover {
+  background: rgba(52, 49, 60, 0.95);
   border-color: var(--cp-accent);
   transform: translateY(-1px);
 }
