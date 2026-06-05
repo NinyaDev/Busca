@@ -10,6 +10,13 @@ export default defineManifest({
     'Busca - a fast, keyboard-first command palette for Chrome. Cmd+T opens it as a new tab, Cmd/Ctrl+K as an overlay on any page.',
   version: '0.1.0',
 
+  icons: {
+    16: 'src/assets/icon-16.png',
+    32: 'src/assets/icon-32.png',
+    48: 'src/assets/icon-48.png',
+    128: 'src/assets/icon-128.png',
+  },
+
   // --- Trigger surfaces (the hybrid strategy) ---
   // 1) Cmd+T: we own the New Tab Page, so a new tab *is* the palette.
   chrome_url_overrides: {
@@ -41,6 +48,12 @@ export default defineManifest({
 
   action: {
     default_title: 'Busca preferences',
+    default_icon: {
+      16: 'src/assets/icon-16.png',
+      32: 'src/assets/icon-32.png',
+      48: 'src/assets/icon-48.png',
+      128: 'src/assets/icon-128.png',
+    },
   },
 
   // Clicking the toolbar icon opens this page (wired in chrome.action.onClicked).
