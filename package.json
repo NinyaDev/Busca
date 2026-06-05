@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Busca - a fast, keyboard-first command palette for Chrome. Cmd+T opens it as a new tab, Cmd/Ctrl+K as an overlay on any page.",
+  "description": "Busca - Keyboard-first command palette for Chrome. Cmd+T opens it as a new tab, Cmd/Ctrl+K as an overlay on any page.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
