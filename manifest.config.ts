@@ -63,4 +63,14 @@ export default defineManifest({
   // Needed to inject the overlay into arbitrary sites and to clear cache/cookies
   // scoped to a given origin. Narrow this later if the feature set allows.
   host_permissions: ['<all_urls>'],
+
+  // Lets the in-page overlay load page favicons from the _favicon endpoint.
+  // Extension pages (the new tab) can use it already; content scripts need it
+  // declared as a web-accessible resource.
+  web_accessible_resources: [
+    {
+      resources: ['_favicon/*'],
+      matches: ['<all_urls>'],
+    },
+  ],
 })
