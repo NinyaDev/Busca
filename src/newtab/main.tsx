@@ -13,8 +13,12 @@ import '../core/palette.css'
 // Chrome (since v27) parks keyboard focus in the omnibox on a fresh new-tab load
 // and ignores the page's focus() calls. Reloading once with a query string makes
 // the next load "not fresh", so our input can take focus. The blink is minimal.
-// (Toggle to first-keystroke focus instead by removing this block - see README.)
-if (!location.search.includes('focus')) {
+// Off by preference -> clean address bar, but the first keystroke goes to the
+// omnibox instead of Busca. Stored in localStorage so it can be read synchronously
+// here, before anything renders. Default on.
+const autoFocusNTP =
+  typeof localStorage !== 'undefined' ? localStorage.getItem('busca:ntpAutoFocus') !== '0' : true
+if (autoFocusNTP && !location.search.includes('focus')) {
   location.search = '?focus'
 }
 

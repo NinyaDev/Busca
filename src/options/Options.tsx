@@ -8,6 +8,7 @@ import type { Bang } from '../shared/bangs'
 export function Options() {
   const [prefs, setPrefs] = useState<Prefs | null>(null)
   const [draft, setDraft] = useState<Bang>({ token: '', label: '', url: '' })
+  const [ntpAutoFocus, setNtpAutoFocus] = useState(true)
 
   useEffect(() => {
     loadPrefs().then(setPrefs)
@@ -20,6 +21,11 @@ export function Options() {
       document.documentElement.style.setProperty('--op-accent', a.accent)
     }
   }, [prefs?.accent])
+
+  // Stored in localStorage (read synchronously by the new tab before render).
+  useEffect(() => {
+    setNtpAutoFocus(localStorage.getItem('busca:ntpAutoFocus') !== '0')
+  }, [])
 
   if (!prefs) return null
   const p = prefs
@@ -77,6 +83,21 @@ export function Options() {
           />
           Show the Google apps button (top-right)
         </label>
+        <label class="op-row">
+          <input
+            type="checkbox"
+            checked={ntpAutoFocus}
+            onChange={(e) => {
+              const v = e.currentTarget.checked
+              setNtpAutoFocus(v)
+              localStorage.setItem('busca:ntpAutoFocus', v ? '1' : '0')
+            }}
+          />
+          Auto-focus the search box on new tab
+        </label>
+        <p class="op-hint">
+          Off keeps the address bar clean, but your first keystroke goes to the address bar instead of Busca.
+        </p>
       </section>
 
       <section class="op-sec">
