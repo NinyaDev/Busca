@@ -33,7 +33,7 @@ export function GoogleApps() {
   return (
     <div class="ga-wrap">
       <button class="ga-btn" title="Google apps" aria-label="Google apps" onClick={() => setOpen((o) => !o)}>
-        <Icon name="grid" />
+        <Icon name="grid" size={22} />
       </button>
       {open && (
         <>

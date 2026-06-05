@@ -291,25 +291,26 @@
   font-family: var(--cp-font);
 }
 .ga-btn {
-  width: 38px;
-  height: 38px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  border: 1px solid var(--cp-border);
+  border: 1px solid var(--cp-border-strong);
   background: var(--cp-panel);
-  color: var(--cp-muted);
+  color: var(--cp-text);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: color 120ms ease, border-color 120ms ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transition: transform 120ms ease, border-color 120ms ease;
 }
 .ga-btn:hover {
-  color: var(--cp-text);
-  border-color: var(--cp-border-strong);
+  border-color: var(--cp-accent);
+  transform: translateY(-1px);
 }
 .ga-grid {
   position: absolute;
-  top: 46px;
+  top: 56px;
   right: 0;
   width: 236px;
   padding: 8px;
