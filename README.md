@@ -16,21 +16,21 @@ Search your tabs, history, and bookmarks, run quick actions, and jump anywhere -
 
 <table>
   <tr>
-    <td width="50%" align="center" valign="top">
+    <td width="50%" align="center" valign="center">
       <a href="docs/screenshots/busca-4.png"><img src="docs/screenshots/busca-4.png" alt="The new-tab palette surfaces browsing history and quick actions." width="440"></a>
       <br><sub>The new-tab palette surfaces browsing history and quick actions.</sub>
     </td>
-    <td width="50%" align="center" valign="top">
+    <td width="50%" align="center" valign="center">
       <a href="docs/screenshots/busca-3.png"><img src="docs/screenshots/busca-3.png" alt="Slash shortcuts choose a search provider from the command palette." width="440"></a>
       <br><sub>Slash shortcuts choose a search provider from the command palette.</sub>
     </td>
   </tr>
   <tr>
-    <td width="50%" align="center" valign="top">
+    <td width="50%" align="center" valign="center">
       <a href="docs/screenshots/busca-1.png"><img src="docs/screenshots/busca-1.png" alt="Quick actions include reopening the last closed tab." width="440"></a>
       <br><sub>Quick actions include reopening the last closed tab.</sub>
     </td>
-    <td width="50%" align="center" valign="top">
+    <td width="50%" align="center" valign="center">
       <a href="docs/screenshots/busca-2.png"><img src="docs/screenshots/busca-2.png" alt="The new-tab launcher provides shortcuts to Google apps." width="440"></a>
       <br><sub>The new-tab launcher provides shortcuts to Google apps.</sub>
     </td>
